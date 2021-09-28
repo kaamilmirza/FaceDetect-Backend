@@ -1,6 +1,9 @@
 const express = require('express');
 const app     = express();
 const bodyParser = require('body-parser');
+app.get('/', (req,res) =>{
+    res.send(database.users);
+})
 app.get('/' , (req,res)=>{
     res.send('This is working.....');
 })
@@ -15,8 +18,7 @@ const database = {
             enteries : 0,
             joined: new Date(),
         },
-        {
-            id: '2',
+        {   id: '2',
             name: 'Priya',
             email: 'Priya@xyz.com',
             password: 'monsoon',
@@ -49,6 +51,35 @@ app.post('/register', (req,res) =>{
      })
      res.json(database.users[database.users.length-1]);
 });
+
+app.get('/profile/:id' , (req,res) =>{
+    const {id} = req.params;
+    let found = false;
+    database.users.forEach(user => {
+        if(user.id === id){
+            found = true;
+           return res.json(user);
+        } 
+    })
+    if(!found){
+            res.status(400).json('Not found....');
+    }
+});
+
+app.put('/image', (req,res) =>{
+    const {id} = req.body;
+    let found = false;
+    database.users.forEach(user => {
+        if(user.id === id){
+            found = true;
+            user.enteries+=1;
+           return res.json(user.enteries);
+        } 
+    })
+    if(!found){
+        res.status(400).json('Not found....');
+        }
+    });
 
 app.listen(3000,()=>{
     console.log('App is running on port 3000')

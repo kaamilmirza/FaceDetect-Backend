@@ -1,6 +1,8 @@
 const express = require('express');
 const app     = express();
 const bodyParser = require('body-parser');
+const bcrpyt = require('bcryptjs');
+
 app.get('/', (req,res) =>{
     res.send(database.users);
 })
@@ -25,6 +27,14 @@ const database = {
             enteries : 0,
             joined: new Date(),
         }
+    ],
+    login: [
+        {
+            id:'123',
+            has: '',
+            email: 'someone@gmail.com'
+        }
+
     ]
 }
 app.post('/signin', (req,res) =>{

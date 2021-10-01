@@ -1,7 +1,8 @@
 const express = require('express');
 const app     = express();
 const bodyParser = require('body-parser');
-const bcrpyt = require('bcryptjs');
+const bcrypt = require('bcryptjs');
+const cors = require('cors');
 
 app.get('/', (req,res) =>{
     res.send(database.users);
@@ -9,7 +10,9 @@ app.get('/', (req,res) =>{
 app.get('/' , (req,res)=>{
     res.send('This is working.....');
 })
+app.use(cors());
 app.use(bodyParser.json());
+
 const database = {
     users :[
         {
@@ -37,7 +40,10 @@ const database = {
 
     ]
 }
+
+
 app.post('/signin', (req,res) =>{
+    console.log(req.body.email);
     if(req.body.email === database.users[0].email
         && req.body.password === database.users[0].password)
         {
@@ -51,6 +57,7 @@ app.post('/signin', (req,res) =>{
 
 app.post('/register', (req,res) =>{
     const{email,name,password} = req.body;
+   
     database.users.push({ 
         id: '1',
         name: name,
@@ -59,6 +66,8 @@ app.post('/register', (req,res) =>{
         enteries : 0,
         joined: new Date(),
      })
+     var hash = bcrypt.hashSync('bacon', 8);
+             console.log(hash);
      res.json(database.users[database.users.length-1]);
 });
 

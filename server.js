@@ -4,14 +4,7 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
 
-app.get('/', (req,res) =>{
-    res.send(database.users);
-})
-app.get('/' , (req,res)=>{
-    res.send('This is working.....');
-})
-app.use(cors());
-app.use(bodyParser.json());
+
 
 const database = {
     users :[
@@ -19,7 +12,7 @@ const database = {
             id: '1',
             name: 'Kaamil',
             email: 'Kaamil@xyz.com',
-            password: 'cookies',
+            password: 'something',
             enteries : 0,
             joined: new Date(),
         },
@@ -40,18 +33,22 @@ const database = {
 
     ]
 }
-
-
+app.use(cors());
+app.use(bodyParser.json());
+app.get('/', (req,res) =>{
+    res.database.users;
+})
 app.post('/signin', (req,res) =>{
-    console.log(req.body.email);
     if(req.body.email === database.users[0].email
         && req.body.password === database.users[0].password)
         {
-        res.json('successfull');
+        res.json('success');
+        
             }
     
     else{
         res.status(400).json('Error logging in');
+        
     }
 })
 
@@ -62,7 +59,6 @@ app.post('/register', (req,res) =>{
         id: '1',
         name: name,
         email: email,
-        password: password,
         enteries : 0,
         joined: new Date(),
      })
@@ -91,7 +87,7 @@ app.put('/image', (req,res) =>{
     database.users.forEach(user => {
         if(user.id === id){
             found = true;
-            user.enteries+=1;
+            user.enteries++
            return res.json(user.enteries);
         } 
     })

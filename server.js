@@ -3,24 +3,39 @@ const app     = express();
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
+const knex = require('knex');
 
 
+const db = knex({
+    client: 'pg',
+    connection: {
+      host : '127.0.0.1',
+      user : 'postgres',
+      password : 'JACKaBOY',
+      database : "'face-detect'"
+    }
+  });
+ 
+db.select('*').from('users').then(data =>
+        console.log(data)
+    );
+ 
 
-const database = {
+ const database = {
     users :[
         {
             id: '1',
             name: 'Kaamil',
             email: 'Kaamil@xyz.com',
-            password: 'something',
-            enteries : 0,
+            password:'something',
+            entries : 0,
             joined: new Date(),
         },
         {   id: '2',
             name: 'Priya',
             email: 'Priya@xyz.com',
             password: 'monsoon',
-            enteries : 0,
+            entries : 0,
             joined: new Date(),
         }
     ],
@@ -33,18 +48,20 @@ const database = {
 
     ]
 }
+
+
 app.use(cors());
 app.use(bodyParser.json());
 app.get('/', (req,res) =>{
     res.database.users;
 })
+
 app.post('/signin', (req,res) =>{
     if(req.body.email === database.users[0].email
         && req.body.password === database.users[0].password)
         {
-        res.json('success');
-        
-            }
+        res.json(database.users[0]);
+        }
     
     else{
         res.status(400).json('Error logging in');
@@ -54,19 +71,17 @@ app.post('/signin', (req,res) =>{
 
 app.post('/register', (req,res) =>{
     const{email,name,password} = req.body;
-   
-    database.users.push({ 
-        id: '1',
-        name: name,
-        email: email,
-        enteries : 0,
+    db('users').insert({
+        email : email,
+        name  : name,
         joined: new Date(),
-     })
-     var hash = bcrypt.hashSync('bacon', 8);
-             console.log(hash);
+    }).then(console.log)
+     /*var hash = bcrypt.hashSync(password, 8);
+         */   
      res.json(database.users[database.users.length-1]);
+     
 });
-
+ 
 app.get('/profile/:id' , (req,res) =>{
     const {id} = req.params;
     let found = false;
@@ -82,16 +97,17 @@ app.get('/profile/:id' , (req,res) =>{
 });
 
 app.put('/image', (req,res) =>{
-    const {id} = req.body;
+    const { id } = req.body;
     let found = false;
     database.users.forEach(user => {
         if(user.id === id){
             found = true;
-            user.enteries++
-           return res.json(user.enteries);
+            user.entries++
+           return res.json(user.entries);
         } 
     })
     if(!found){
+        console.log(id);
         res.status(400).json('Not found....');
         }
     });

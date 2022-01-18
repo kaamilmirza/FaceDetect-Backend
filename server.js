@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
 const knex = require('knex');
+const { response } = require('express');
 
 
 const db = knex({
@@ -71,30 +72,33 @@ app.post('/signin', (req,res) =>{
 
 app.post('/register', (req,res) =>{
     const{email,name,password} = req.body;
-    db('users').insert({
+    db('users')
+    .returning('*')
+    .insert({
         email : email,
         name  : name,
         joined: new Date(),
-    }).then(console.log)
-     /*var hash = bcrypt.hashSync(password, 8);
-         */   
-     res.json(database.users[database.users.length-1]);
-     
-});
- 
+    }).then(user => {
+        res.json(user[0]);
+    })
+    .catch(err => res.status(400).json(err))
+})
+
 app.get('/profile/:id' , (req,res) =>{
     const {id} = req.params;
-    let found = false;
-    database.users.forEach(user => {
-        if(user.id === id){
-            found = true;
-           return res.json(user);
-        } 
+    
+    db.select('*').from('users').where({id}).then(user => {
+        if(user.length){
+            res.json(user[0])
+        }
+        else{
+            res.status(400).json('Not Found')
+        }
+        
     })
-    if(!found){
-            res.status(400).json('Not found....');
-    }
-});
+    
+    .catch(err => res.status(400).json('Error getting user') )
+})
 
 app.put('/image', (req,res) =>{
     const { id } = req.body;
@@ -115,4 +119,3 @@ app.put('/image', (req,res) =>{
 app.listen(3000,()=>{
     console.log('App is running on port 3000')
                     });
-
